@@ -1,12 +1,14 @@
-require('dotenv').config()
+require("dotenv").config();
+const { hash } = require("argon2");
 const movieHandlers = require("./movieHandlers");
 const userHandlers = require("./userHandlers");
 
 const express = require("express");
+const { hashPassword } = require("./auth");
 
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 const port = process.env.APP_PORT ?? 5000;
 
@@ -18,7 +20,7 @@ app.get("/", welcome);
 
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
-app.get('/api/users', userHandlers.getUsers);
+app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUsersById);
 
 app.listen(port, (err) => {
@@ -29,11 +31,11 @@ app.listen(port, (err) => {
   }
 });
 
-app.post("/api/movies", movieHandlers.postMovie)
-app.post("/api/users", userHandlers.postUser)
+app.post("/api/movies", movieHandlers.postMovie);
+app.post("/api/users", hashPassword, userHandlers.postUser);
 
-app.put("/api/movies/:id", movieHandlers.updateMovie)
-app.put("/api/users/:id", userHandlers.updateUser)
+app.put("/api/movies/:id", movieHandlers.updateMovie);
+app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
 
-app.delete("/api/movies/:id", movieHandlers.deleteMovie)
-app.delete("/api/users/:id", userHandlers.deleteUser)
+app.delete("/api/movies/:id", movieHandlers.deleteMovie);
+app.delete("/api/users/:id", userHandlers.deleteUser);
